@@ -129,6 +129,9 @@ class LitResnet(pl.LightningModule):
         super().__init__()
 
         self.save_hyperparameters()
+        self.hparams.batch_size = kwargs['batch_size']
+        self.hparams.max_epochs = kwargs['max_epochs']
+
         self.model = create_custom_model(kernel, padding, factorized, hamming,
                                          big_first, wm, first_downsampling,
                                          num_classes)
@@ -155,6 +158,10 @@ class LitResnet(pl.LightningModule):
             self.log(f'{stage}_loss', loss, prog_bar=True)
             self.log(f'{stage}_acc', acc, prog_bar=True)
 
+        # hack to see metrics at hparams tab in TB
+        self.log('hp_metric', acc, prog_bar=False)
+
+
     def validation_step(self, batch, batch_idx):
         self.evaluate(batch, 'val')
 
@@ -162,10 +169,11 @@ class LitResnet(pl.LightningModule):
         self.evaluate(batch, 'test')
 
     def configure_optimizers(self):
-        optimizer = torch.optim.SGD(self.parameters(), lr=self.hparams.lr,
+        optimizer = torch.optim.SGD(self.model.parameters(),
+                                    lr=self.hparams.lr,
                                     momentum=0.9, weight_decay=5e-4)
         scheduler_dict = {
-            'scheduler': OneCycleLR(optimizer, 0.1,
+            'scheduler': OneCycleLR(optimizer, self.hparams.lr,
                                     epochs=self.trainer.max_epochs,
                                     steps_per_epoch=len(
                                         self.datamodule.train_dataloader())),

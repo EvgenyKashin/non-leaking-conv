@@ -37,14 +37,15 @@ def run_cli():
     # parent_parser = pl.Trainer.add_argparse_args(parent_parser)
     parent_parser.add_argument('--experiment_name', type=str, required=True,
                                help='folder for experiment logs')
-    parent_parser.add_argument('--batch_size', type=int, default=32)
-    parent_parser.add_argument('--num_workers', type=int, default=4)
-    parent_parser.add_argument('--max_epochs', type=int, default=40)
-    parent_parser.add_argument('--gpus', type=int, default=0)
+    parent_parser.add_argument('--batch_size', type=int, default=128)
+    parent_parser.add_argument('--num_workers', type=int, default=16)
+    parent_parser.add_argument('--max_epochs', type=int, default=20)
+    parent_parser.add_argument('--gpus', type=int, default=1)
 
     parser = LitResnet.add_model_specific_args(parent_parser)
     parser.set_defaults(
         profiler="simple",
+        auto_lr_find=False
     )
     args = parser.parse_args()
     main(args)
@@ -55,13 +56,16 @@ def main(args):
 
     model = LitResnet(**vars(args))
     model.datamodule = make_cifar10_dm(args.batch_size, args.num_workers)
+    print(model.hparams)
 
     trainer = pl.Trainer.from_argparse_args(
         args,
         logger=pl.loggers.TensorBoardLogger('lightning_logs/',
-                                            name=args.experiment_name),
+                                            name=args.experiment_name,
+                                            default_hp_metric=True),
         callbacks=[LearningRateMonitor(logging_interval='step')])
 
+    # trainer.tune(model, model.datamodule)
     trainer.fit(model, model.datamodule)
     trainer.test(model, datamodule=model.datamodule)
 
