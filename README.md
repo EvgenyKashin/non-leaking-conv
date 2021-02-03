@@ -32,7 +32,8 @@ with the baseline ResNet - change the width multiplier to match the total amount
 ### Training
 Example for a training factorized non leaking model with the same number of weights as in the baseline:
 ```bash
-python train.py  --experiment_name 7x7_hamming_factorized --kernel 7 --padding 3 --factorized --wm 0.78125 --hamming
+python train.py  --experiment_name 7x7_hamming_factorized --kernel 7 --padding 3 \
+ --factorized --wm 0.78125 --hamming
 ```
 
 ### Visualization of the learned kernels
@@ -49,6 +50,9 @@ ResNet18 without the first maxpool and stride=2 in the first conv (CIFAR size ad
 |accuracy(%)|**93.2**|92.0             |91.7      |**93.2**          | 
 |weights(K) |11,173  |8,039            |60,005    |60,005            | 
 
+Of course, Hamming conv version has good accuracy - it just has a lot more parameters! 
+Though it didn't help a regular ResNet with kernel size 7x7 either.
+
 #### With matching the total amount of weights
 I haven't found details of the author's comparisons with equal amounts of total weights, which looks more fair to 
 me (there is a "wide" model, but it's not clear for me).
@@ -61,6 +65,9 @@ me (there is a "wide" model, but it's not clear for me).
 
 *width mult - channel width multiplier (coefficient to reduce the number of weights by multiplying it by the number 
 of channels in conv2d)
+
+With the same number of weights, the Hamming conv version has worse accuracy than the baseline ResNet 3x3, but much 
+better than the ResNet 7x7.
 
 ### ImageNet
 TODO
