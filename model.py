@@ -206,6 +206,6 @@ class LitResnet(pl.LightningModule):
                                  'stride and maxpool)')
         parser.add_argument('--num_classes', default=10, type=int,
                             help='output size of last layer')
-        parser.add_argument('--lr', default=0.05, type=float,
+        parser.add_argument('--lr', default=0.1, type=float,
                             help='learning rate')
         return parser

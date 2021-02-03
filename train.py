@@ -39,7 +39,7 @@ def run_cli():
                                help='folder for experiment logs')
     parent_parser.add_argument('--batch_size', type=int, default=128)
     parent_parser.add_argument('--num_workers', type=int, default=16)
-    parent_parser.add_argument('--max_epochs', type=int, default=20)
+    parent_parser.add_argument('--max_epochs', type=int, default=40)
     parent_parser.add_argument('--gpus', type=int, default=1)
 
     parser = LitResnet.add_model_specific_args(parent_parser)
